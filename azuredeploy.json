@@ -360,7 +360,7 @@
                 "web": "TEST-prd-APP-VM",
                 "mgt": "TEST-prd-MGT-VM",
                 "sql0" : "TEST-prd-SQL1-VM",
-                "sql1" : "TEST-prd-SQL1-VM"
+                "sql1" : "TEST-prd-SQL2-VM"
             },
             "nics": {
                 "adpdc": "TEST-prd-DC1-nic",
