@@ -245,7 +245,7 @@
         "staticIPWEBStart": 5,
         "RDPNAT": "RDP",
         "omsSettings": {
-          "workspaceRegion": "USGov Virginia",
+          "workspaceRegion": "UK South",
           "serviceTier": "PerNode",
           "dataRetention": 365
         },
