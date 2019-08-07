@@ -13,7 +13,7 @@ This Azure Blueprint solution is comprised of JSON configuration files and Power
 
 3. Click the button below, sign into the Azure portal, enter the required ARM template parameters, and click **Purchase**. [Read more about deployment.](#deployment)
 
-	[![Deploy to Azure](http://azuredeploy.net/AzureGov.png)](https://portal.azure.us/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2FAzure%2Ffedramp-iaas-webapp%2Fmaster%2Fazuredeploy.json)
+	[![Deploy to Azure](http://azuredeploy.net/deploybutton.png)](https://azuredeploy.net/)
 	
 4. When the deployment completes, there is a post-deployment script in the repository for registering and initiating initial backup. This step can be completed before or after configuring the VM environment for the application to be deployed into the environment.
 
