@@ -1,0 +1,144 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "location": {
+      "type": "string"
+    },
+    "webNICName": {
+        "type": "string"
+    },
+    "subnetRef": {
+        "type": "string"
+    },
+    "webSubnetAddressRange": {
+        "type": "string"
+    },
+    "staticIPWEBStart": {
+        "type": "int"
+    },
+    "webNSGid": {
+        "type": "string"
+    },
+    "adPDCNicName": {
+      "type": "string"
+    },
+    "adPDCNICIPAddress": {
+      "type": "string"
+    },
+    "dcSubnetRef": {
+      "type": "string"
+    },
+    "adBEAddressPoolID": {
+      "type": "string"
+    },
+    "adRDPNATRuleID": {
+      "type": "string"
+    },
+    "adBDCNicName": {
+      "type": "string"
+    },
+    "adBDCNICIPAddress": {
+      "type": "string"
+    },
+    "dcNSGid": {
+      "type": "string"
+    },
+    "mgtNicName": {
+      "type": "string"
+    },
+    "mgtIPAddress": {
+      "type": "string"
+    },
+    "mgtNSGid": {
+      "type": "string"
+    },
+    "mgtSubnetRef": {
+      "type": "string"
+    },
+    "mgtPublicIPName": {
+      "type": "string"
+    },
+	  "ipAddressArray": {
+      "type": "array"
+    }
+  },
+  "resources": [
+    {
+      "apiVersion": "2015-06-15",
+      "type": "Microsoft.Network/publicIPAddresses",
+      "name": "[parameters('mgtPublicIPName')]",
+      "location": "[parameters('location')]",
+      "tags": {
+        "Project": "Blueprint"
+      },
+      "properties": {
+        "publicIPAllocationMethod": "Dynamic"
+      }
+    },
+    {
+      "name": "[parameters('mgtNicName')]",
+      "type": "Microsoft.Network/networkInterfaces",
+      "location": "[parameters('location')]",
+      "dependsOn": [
+        "[resourceId('Microsoft.Network/publicIPAddresses/', parameters('mgtPublicIPName'))]"
+      ],
+      "apiVersion": "2015-06-15",
+      "tags": {
+        "Project": "Blueprint"
+      },
+      "properties": {
+        "ipConfigurations": [
+          {
+            "name": "ipconfig1",
+            "properties": {
+              "privateIPAllocationMethod": "Static",
+              "publicIPAddress": {
+                "id": "[resourceId('Microsoft.Network/publicIPAddresses', parameters('mgtPublicIPName'))]"
+              },
+              "privateIPAddress": "[parameters('mgtIPAddress')]",
+              "subnet": {
+                "id": "[parameters('mgtSubnetRef')]"
+              }
+            }
+          }
+        ],
+        "networkSecurityGroup": {
+            "id": "[parameters('mgtNSGid')]"
+        }
+      }
+    },
+    {
+        "apiVersion": "2015-05-01-preview",
+        "type": "Microsoft.Network/networkInterfaces",
+        "name": "[concat(parameters('webNICName'), copyindex())]",
+        "location": "[parameters('location')]",
+        "tags": {
+            "Project": "Blueprint"
+        },
+        "copy": {
+            "name": "nicLoopDEL",
+            "count": "[length(parameters('ipAddressArray'))]"
+        },
+        "dependsOn": [],
+        "properties": {
+            "ipConfigurations": [
+              {
+                "name": "ipconfig1",
+                "properties": {
+                    "privateIPAllocationMethod": "Static",
+                    "privateIPAddress": "[parameters('ipAddressArray')[copyindex('nicLoopDEL')].IpAddress]",
+                    "subnet": {
+                        "id": "[parameters('subnetRef')]"
+                    }
+                }
+              }
+            ],
+            "networkSecurityGroup": {
+                "id": "[parameters('webNSGid')]"
+            }
+        }
+    }
+  ],
+  "outputs": {}
+}

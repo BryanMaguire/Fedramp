@@ -1,0 +1,218 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "location": {
+      "type": "string"
+    },
+    "numberOfWebInstances": {
+        "type": "int",
+        "defaultValue": 2,
+        "minValue": 2,
+        "maxValue": 5
+    },
+    "WebVMName": {
+        "type": "string"
+    },
+    "WebStorageAccountName": {
+        "type": "string"
+    },
+    "WebVMSize": {
+        "type": "string"
+    },
+    "webNICName": {
+        "type": "string"
+    },
+    "appImagePublisher": {
+        "type": "string"
+    },
+    "appImageOffer": {
+        "type": "string"
+    },
+    "appImageSKU": {
+        "type": "string"
+    },
+    "webAvailabilitySetName": {
+        "type": "string"
+    },
+    "adAvailabilitySetName": {
+        "type": "string"
+    },
+    "adPDCVMName": {
+        "type": "string"
+    },
+    "adVMSize": {
+        "type": "string"
+    },
+    "adminUsername": {
+        "type": "securestring"
+    },
+    "adminPassword": {
+        "type": "securestring"
+    },
+    "adImagePublisher": {
+        "type": "string"
+    },
+    "adImageOffer": {
+        "type": "string"
+    },
+    "adImageSKU": {
+        "type": "string"
+    },
+    "adPDCNicName": {
+        "type": "string"
+    },
+    "adBDCVMName": {
+        "type": "string"
+    },
+    "adBDCNicName": {
+        "type": "string"
+    },
+    "dcStorageAccountName": {
+        "type": "string"
+    },
+    "mgtStorageAccountName": {
+        "type": "string"
+    },
+    "vmContainerName": {
+        "type": "string"
+    },
+    "mgtImagePublisher": {
+        "type": "string"
+    },
+    "mgtImageOffer": {
+        "type": "string"
+    },
+    "mgtImageSKU": {
+        "type": "string"
+    },
+    "domainName": {
+        "type": "string"
+    },
+    "mgtVMName": {
+        "type": "string"
+    },
+    "mgtVMSize": {
+        "type": "string"
+    },
+    "mgtNICName": {
+        "type": "string"
+    }
+  },
+  "variables": {
+    "dcstorageName": "[parameters('dcStorageAccountName')]",
+    "diagstorageNameDC": "[concat(parameters('dcStorageAccountName'), 'diag')]",
+    "domainJoinUserName": "[concat(split(parameters('domainName'), '.')[0], '\\', parameters('adminUsername'))]"
+  },
+  "resources": [
+    {
+      "apiVersion": "2017-12-01",
+      "type": "Microsoft.Compute/virtualMachines",
+      "name": "[parameters('mgtVMName')]",
+      "location": "[parameters('location')]",
+      "dependsOn": [
+      ],
+      "properties": {
+        "hardwareProfile": {
+          "vmSize": "[parameters('mgtVMSize')]"
+        },
+        "osProfile": {
+          "computerName": "[parameters('mgtVMName')]",
+          "adminUsername": "[parameters('adminUsername')]",
+          "adminPassword": "[parameters('adminPassword')]"
+        },
+        "storageProfile": {
+          "imageReference": {
+            "publisher": "[parameters('mgtImagePublisher')]",
+            "offer": "[parameters('mgtImageOffer')]",
+            "sku": "[parameters('mgtImageSKU')]",
+            "version": "latest"
+          },
+          "osDisk": {
+            "name": "osdisk",
+            "vhd": {
+              "uri": "[concat('http://',parameters('mgtStorageAccountName'),'.blob.core.usgovcloudapi.net/vhds/',parameters('mgtVMName'), 'disk0.vhd')]"
+            },
+            "caching": "ReadWrite",
+            "createOption": "FromImage"
+          },
+          "dataDisks": [
+            {
+              "name": "myvm-data-disk1",
+              "vhd": {
+                "Uri": "[concat('http://',parameters('mgtStorageAccountName'),'.blob.core.usgovcloudapi.net/vhds/',parameters('mgtVMName'), 'disk1.vhd')]"
+              },
+              "caching": "None",
+              "createOption": "Empty",
+              "diskSizeGB": "1000",
+              "lun": 0
+            }
+          ]
+        },
+        "networkProfile": {
+          "networkInterfaces": [
+            {
+              "id": "[resourceId('Microsoft.Network/networkInterfaces', parameters('mgtNICName'))]"
+            }
+          ]
+        },
+        "diagnosticsProfile": {
+          "bootDiagnostics": {
+            "enabled": "true",
+            "storageUri": "[concat('http://',parameters('mgtStorageAccountName'),'.blob.core.usgovcloudapi.net')]"
+          }
+        }
+      }
+    },
+    {
+        "apiVersion": "2017-12-01",
+        "type": "Microsoft.Compute/virtualMachines",
+        "name": "[concat(parameters('WebVMName'), copyindex())]",
+        "location": "[parameters('location')]",
+        "tags": {
+            "Project": "Blueprint"
+        },
+        "copy": {
+            "name": "vmLoopDEL",
+            "count": "[parameters('numberOfWebInstances')]"
+        },
+        "dependsOn": [],
+        "properties": {
+            "hardwareProfile": {
+                "vmSize": "[parameters('WebVMSize')]"
+            },
+            "availabilitySet": {
+                "id": "[resourceId('Microsoft.Compute/availabilitySets',parameters('webAvailabilitySetName'))]"
+            },
+            "osProfile": {
+                "computername": "[concat(parameters('WebVMName'), copyindex())]",
+                "adminUsername": "[parameters('adminUsername')]",
+                "adminPassword": "[parameters('adminPassword')]"
+            },
+            "storageProfile": {
+                "imageReference": {
+                    "publisher": "[parameters('appImagePublisher')]",
+                    "offer": "[parameters('appImageOffer')]",
+                    "sku": "[parameters('appImageSKU')]",
+                    "version": "latest"
+                },
+                "osDisk": {
+                    "name": "osdisk",
+                    "vhd": {
+                        "uri": "[concat('http://',parameters('WebStorageAccountName'),'.blob.core.usgovcloudapi.net/',parameters('vmContainerName'),'/',parameters('WebVMName'), copyindex(), '-osdisk.vhd')]"
+                    },
+                    "caching": "ReadWrite",
+                    "createOption": "FromImage"
+                }
+            },
+            "networkProfile": {
+                "networkInterfaces": [{
+                    "id": "[resourceId(resourceGroup().name,'Microsoft.Network/networkInterfaces', concat(parameters('webNICName'), copyindex()))]"
+                }]
+            }
+        },
+        "resources": []
+    }
+  ],
+  "outputs": {}
+}

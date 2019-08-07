@@ -1,0 +1,82 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "adBDCVMName": {
+      "type": "string"
+    },
+    "location": {
+      "type": "string"
+    },
+    "adminUsername": {
+      "type": "securestring"
+    },
+    "adminPassword": {
+      "type": "securestring"
+    },
+    "domainName": {
+      "type": "string"
+    },
+    "bdcConfigureConfigurationFunction": {
+      "type": "string"
+    },
+    "bdcModulesURL": {
+      "type": "string"
+    },
+    "adPDCNICIPAddress": {
+      "type": "string"
+    },
+    "antimalwareInfo": {
+      "type": "object"
+    },
+    "workspaceName": {
+      "type": "string"
+    },
+    "ResourceGroupName": {
+      "type": "string"
+    },
+    "AutomationAccountName": {
+      "type": "string"
+    },
+    "SubscriptionId": {
+      "type": "string"
+    },
+    "EnvironmentName": {
+      "type": "string"
+    }
+  },
+  "resources": [
+    {
+      "type": "Microsoft.Compute/virtualMachines/extensions",
+      "name": "[concat(parameters('adBDCVMName'),'/BDCBaselineDSC')]",
+      "apiVersion": "2015-06-15",
+      "tags": {
+        "Project": "Blueprint"
+      },
+      "location": "[parameters('location')]",
+      "properties": {
+        "publisher": "Microsoft.Powershell",
+        "type": "DSC",
+        "typeHandlerVersion": "2.20",
+        "autoUpgradeMinorVersion": true,
+        "settings": {
+          "modulesURL": "[parameters('bdcModulesURL')]",
+          "configurationFunction": "[parameters('bdcConfigureConfigurationFunction')]",
+          "Properties": {
+            "domainName": "[parameters('domainName')]",
+            "adminCreds": {
+              "userName": "[parameters('adminUsername')]",
+              "password": "PrivateSettingsRef:adminPassword"
+            }
+          }
+        },
+        "protectedSettings": {
+         "items": {
+            "adminPassword": "[parameters('adminPassword')]"
+          }
+        }
+      }
+    }
+  ],
+    "outputs": {}
+}

@@ -1,0 +1,62 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "vmName": {
+            "type": "string"
+        },
+        "location": {
+            "type": "string"
+        },
+        "workspaceName": {
+            "type": "string"
+        },
+        "ResourceGroupName": {
+            "type": "string"
+        },
+        "AutomationAccountName": {
+            "type": "string"
+        },
+        "SubscriptionId": {
+            "type": "string"
+        },
+        "EnvironmentName": {
+            "type": "string"
+        },
+        "accountManagementPrincipalsUrl": {
+            "type": "string"
+        },
+        "MachinesToSetPasswordPolicy": {
+            "type": "string"
+        },
+        "domainName": {
+            "type": "string"
+        }
+    },
+    "variables": {
+        "scriptFolder": ".",
+        "scriptParameters": "[concat('-MachineName \"', parameters('vmName'), '\" -ResourceGroupName \"', parameters('ResourceGroupName'), '\" -AutomationAccountName \"', parameters('AutomationAccountName'), '\" -WorkspaceName \"', parameters('workspaceName'),'\" -SubscriptionId \"', parameters('SubscriptionId'), '\" -EnvironmentName \"', parameters('EnvironmentName'), '\" -MachinesToSetPasswordPolicy \"', parameters('MachinesToSetPasswordPolicy'), '\" -domainName \"', parameters('domainName'))]"
+    },
+    "resources": [
+      {
+            "type": "Microsoft.Compute/virtualMachines/extensions",
+            "name": "[concat(parameters('vmName'), '/EnterpriseCloudMonitoring')]",
+            "apiVersion": "2016-03-30",
+            "location": "[parameters('location')]",
+            "dependsOn": [],
+            "properties": {
+                "publisher": "Microsoft.EnterpriseCloud.Monitoring",
+                "type": "MicrosoftMonitoringAgent",
+                "typeHandlerVersion": "1.0",
+                "autoUpgradeMinorVersion": true,
+                "settings": {
+                    "workspaceId": "[reference(resourceId('Microsoft.OperationalInsights/workspaces/', parameters('workspaceName')), '2015-03-20').customerId]"
+                },
+                "protectedSettings": {
+                    "workspaceKey": "[listKeys(resourceId('Microsoft.OperationalInsights/workspaces/', parameters('workspaceName')), '2015-03-20').primarySharedKey]"
+                }
+            }
+        }
+    ],
+    "outputs": {}
+}

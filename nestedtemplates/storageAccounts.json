@@ -1,0 +1,189 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "location": {
+      "type": "string"
+    },
+    "webStorageAccountName": {
+      "type": "string"
+    },
+    "StorageAccountType": {
+      "type": "string"
+    },
+    "dcStorageAccountName": {
+        "type": "string"
+    },
+    "omsWorkspaceName": {
+      "type": "string"
+    },
+    "mgtStorageAccountName": {
+        "type": "string"
+    }
+  },
+  "variables": {
+    "dcstorageName": "[parameters('dcStorageAccountName')]",
+    "diagstorageNameDC": "[concat(parameters('dcStorageAccountName'), 'diag')]"
+  },
+  "resources": [
+    {
+        "type": "Microsoft.Storage/storageAccounts",
+        "name": "[parameters('webStorageAccountName')]",
+        "apiVersion": "2016-01-01",
+        "tags": {
+            "Project": "Blueprint"
+        },
+        "location": "[parameters('location')]",
+        "sku": {
+            "name": "[parameters('StorageAccountType')]"
+        },
+        "kind": "Storage",
+        "properties": {
+            "encryption": {
+                "services": {
+                    "blob": {
+                        "enabled": true
+                    }
+                },
+                "keySource": "Microsoft.Storage"
+            }
+        }
+    },
+    {
+      "apiVersion": "2015-11-01-preview",
+      "name": "[concat(parameters('omsWorkspaceName'), '/', parameters('webStorageAccountName'))]",
+      "type": "Microsoft.OperationalInsights/workspaces/storageInsightConfigs",
+      "dependsOn": [
+        "[concat('Microsoft.Storage/storageAccounts/', parameters('webStorageAccountName'))]"
+      ],
+      "properties": {
+        "containers": [],
+        "tables": [],
+        "storageAccount": {
+          "id": "[resourceId('Microsoft.Storage/storageaccounts/', parameters('webStorageAccountName'))]",
+          "key": "[listKeys(resourceId('Microsoft.Storage/storageAccounts', parameters('webStorageAccountName')),'2015-06-15').key1]"
+        }
+      }
+    },
+    {
+        "type": "Microsoft.Storage/storageAccounts",
+        "name": "[parameters('dcStorageAccountName')]",
+        "apiVersion": "2016-01-01",
+        "tags": {
+            "Project": "Blueprint"
+        },
+        "location": "[parameters('location')]",
+        "sku": {
+            "name": "[parameters('StorageAccountType')]"
+        },
+        "kind": "Storage",
+        "properties": {
+            "encryption": {
+                "services": {
+                    "blob": {
+                        "enabled": true
+                    }
+                },
+                "keySource": "Microsoft.Storage"
+            }
+        }
+    },
+    {
+      "apiVersion": "2015-11-01-preview",
+      "name": "[concat(parameters('omsWorkspaceName'), '/', parameters('dcStorageAccountName'))]",
+      "type": "Microsoft.OperationalInsights/workspaces/storageInsightConfigs",
+      "dependsOn": [
+        "[concat('Microsoft.Storage/storageAccounts/', parameters('dcStorageAccountName'))]"
+      ],
+      "properties": {
+        "containers": [ ],
+        "tables": [
+
+        ],
+        "storageAccount": {
+          "id": "[resourceId('Microsoft.Storage/storageaccounts/', parameters('dcStorageAccountName'))]",
+          "key": "[listKeys(resourceId('Microsoft.Storage/storageAccounts', parameters('dcStorageAccountName')),'2015-06-15').key1]"
+        }
+      }
+    },
+    {
+        "type": "Microsoft.Storage/storageAccounts",
+        "name": "[parameters('mgtStorageAccountName')]",
+        "apiVersion": "2016-01-01",
+        "tags": {
+            "Project": "Blueprint"
+        },
+        "location": "[parameters('location')]",
+        "sku": {
+            "name": "[parameters('StorageAccountType')]"
+        },
+        "kind": "Storage",
+        "properties": {
+            "encryption": {
+                "services": {
+                    "blob": {
+                        "enabled": true
+                    }
+                },
+                "keySource": "Microsoft.Storage"
+            }
+        }
+    },
+    {
+      "apiVersion": "2015-11-01-preview",
+      "name": "[concat(parameters('omsWorkspaceName'), '/', parameters('mgtStorageAccountName'))]",
+      "type": "Microsoft.OperationalInsights/workspaces/storageInsightConfigs",
+      "dependsOn": [
+        "[concat('Microsoft.Storage/storageAccounts/', parameters('mgtStorageAccountName'))]"
+      ],
+      "properties": {
+        "containers": [],
+        "tables": [],
+        "storageAccount": {
+          "id": "[resourceId('Microsoft.Storage/storageaccounts/', parameters('mgtStorageAccountName'))]",
+          "key": "[listKeys(resourceId('Microsoft.Storage/storageAccounts', parameters('mgtStorageAccountName')),'2015-06-15').key1]"
+        }
+      }
+    },
+    {
+        "type": "Microsoft.Storage/storageAccounts",
+        "name": "[variables('diagstorageNameDC')]",
+        "apiVersion": "2016-01-01",
+        "tags": {
+            "Project": "Blueprint"
+        },
+        "location": "[parameters('location')]",
+        "sku": {
+            "name": "[parameters('StorageAccountType')]"
+        },
+        "kind": "Storage",
+        "properties": {
+            "encryption": {
+                "services": {
+                    "blob": {
+                        "enabled": true
+                    }
+                },
+                "keySource": "Microsoft.Storage"
+            }
+        }
+    },
+    {
+      "apiVersion": "2015-11-01-preview",
+      "name": "[concat(parameters('omsWorkspaceName'), '/', variables('diagstorageNameDC'))]",
+      "type": "Microsoft.OperationalInsights/workspaces/storageInsightConfigs",
+      "dependsOn": [
+        "[concat('Microsoft.Storage/storageAccounts/', variables('diagstorageNameDC'))]"
+      ],
+      "properties": {
+        "containers": [],
+        "tables": [],
+        "storageAccount": {
+          "id": "[resourceId('Microsoft.Storage/storageaccounts/', variables('diagstorageNameDC'))]",
+          "key": "[listKeys(resourceId('Microsoft.Storage/storageAccounts', variables('diagstorageNameDC')),'2015-06-15').key1]"
+        }
+      }
+    }
+  ],
+  "outputs": {}
+}

@@ -1,0 +1,1868 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        #todo remove environmentname parameter
+        "environmentName": {
+            "type": "string",
+            "defaultValue": "AzureUSGovernment",
+            "metadata": {
+                "description": "The name of the Azure envrionment for use with the deployment (Azure Commercial or Azure Government)."
+            }
+        },
+        "keyVaultName": {
+            "type": "string",
+            "metadata": {
+                "description": "Name of the Key Vault created by the pre-deployment script."
+            }
+        },
+        "keyVaultResourceGroupName": {
+            "type": "string",
+            "metadata": {
+                "description": "Resource group associated to the Key Vault created during pre-deployment."
+            }
+        },
+        "encryptionEnabled": {
+            "type": "bool",
+            "defaultValue": true,
+            "metadata": {
+                "description": "Boolean toggle for setting VM encryption as a part of the deployment."
+            }
+        },
+        "adVMSize": {
+            "type": "string",
+            "allowedValues": [
+                "Standard_D1_v2",
+                "Standard_D2_v2",
+                "Standard_D3_v2",
+                "Standard_D4_v2",
+                "Standard_D5_v2",
+                "Standard_D11_v2",
+                "Standard_D12_v2",
+                "Standard_D13_v2",
+                "Standard_D14_v2",
+                "Standard_D15_v2",
+                "Standard_D1",
+                "Standard_D2",
+                "Standard_D3",
+                "Standard_D4",
+                "Standard_D11",
+                "Standard_D12",
+                "Standard_D13",
+                "Standard_D14",
+                "Standard_DS1",
+                "Standard_DS2",
+                "Standard_DS3",
+                "Standard_DS4",
+                "Standard_DS11",
+                "Standard_DS12",
+                "Standard_DS13",
+                "Standard_DS14",
+                "Standard_DS1_v2",
+                "Standard_DS2_v2",
+                "Standard_DS3_v2",
+                "Standard_DS4_v2",
+                "Standard_DS5_v2",
+                "Standard_DS11_v2",
+                "Standard_DS12_v2",
+                "Standard_DS13_v2",
+                "Standard_DS14_v2",
+                "Standard_DS15_v2",
+                "Standard_GS1",
+                "Standard_GS2",
+                "Standard_GS3",
+                "Standard_GS4",
+                "Standard_GS4",
+                "Standard_GS5"
+            ],
+            "metadata": {
+                "description": "The size of the VMs created for the Active Directory tier."
+            },
+            "defaultValue": "Standard_D1_v2"
+        },
+        "webVMSize": {
+            "type": "string",
+            "allowedValues": [
+                "Standard_DS1",
+                "Standard_DS2",
+                "Standard_DS3",
+                "Standard_DS4",
+                "Standard_D2_v2",
+                "Standard_DS11",
+                "Standard_DS12",
+                "Standard_DS13",
+                "Standard_DS14",
+                "Standard_DS1_v2",
+                "Standard_DS2_v2",
+                "Standard_DS3_v2",
+                "Standard_DS4_v2",
+                "Standard_DS5_v2",
+                "Standard_DS11_v2",
+                "Standard_DS12_v2",
+                "Standard_DS13_v2",
+                "Standard_DS14_v2",
+                "Standard_DS15_v2",
+                "Standard_GS1",
+                "Standard_GS2",
+                "Standard_GS3",
+                "Standard_GS4",
+                "Standard_GS4",
+                "Standard_GS5"
+            ],
+            "metadata": {
+                "description": "The size of the VMs created for the Web tier."
+            },
+            "defaultValue": "Standard_D2_v2"
+        },
+        "mgtVMSize": {
+            "type": "string",
+            "allowedValues": [
+                "Standard_DS1",
+                "Standard_D1_v2",
+                "Standard_DS2",
+                "Standard_DS3",
+                "Standard_DS4",
+                "Standard_DS11",
+                "Standard_DS12",
+                "Standard_DS13",
+                "Standard_DS14",
+                "Standard_DS1_v2",
+                "Standard_DS2_v2",
+                "Standard_DS3_v2",
+                "Standard_DS4_v2",
+                "Standard_DS5_v2",
+                "Standard_DS11_v2",
+                "Standard_DS12_v2",
+                "Standard_DS13_v2",
+                "Standard_DS14_v2",
+                "Standard_DS15_v2",
+                "Standard_GS1",
+                "Standard_GS2",
+                "Standard_GS3",
+                "Standard_GS4",
+                "Standard_GS4",
+                "Standard_GS5"
+            ],
+            "metadata": {
+                "description": "The size of the VM created for use as a management bastion host."
+            },
+            "defaultValue": "Standard_D1_v2"
+        },
+        "sqlVmSize": {
+            "type": "string",
+            "allowedValues": [
+              "Standard_D1_v2",
+              "Standard_D2_v2",
+              "Standard_D3_v2",
+              "Standard_D4_v2",
+              "Standard_D5_v2",
+              "Standard_D11_v2",
+              "Standard_D12_v2",
+              "Standard_D13_v2",
+              "Standard_D14_v2",
+              "Standard_D15_v2",
+              "Standard_DS1_v2",
+              "Standard_DS2_v2",
+              "Standard_DS3_v2",
+              "Standard_DS4_v2",
+              "Standard_DS5_v2",
+              "Standard_DS11_v2",
+              "Standard_DS12_v2",
+              "Standard_DS13_v2",
+              "Standard_DS14_v2",
+              "Standard_DS15_v2"
+            ],
+            "defaultValue": "Standard_D2_v2",
+            "metadata": {
+                "description": "The size of the VMs created for the SQL tier."
+            }
+        },
+        "sqlServerVersion": {
+            "type": "string",
+            "allowedValues": [
+                "SQL2017-WS2016"
+            ],
+            "metadata": {
+                "description": "The image used for the SQL VMs. SQL Server and OS versions are set for SQL Server 2017 on Windows Server 2016 nodes."
+            },
+            "defaultValue": "SQL2017-WS2016"
+        },
+        "StorageAccountType": {
+            "type": "string",
+            "allowedValues": [
+                "Standard_GRS",
+                "Standard_RAGRS"
+            ],
+            "metadata": {
+                "description": "The type of Geo-Redundant storage account used for the VMs in the deployment."
+            },
+            "defaultValue": "Standard_GRS"
+        },
+        "templatesBaseUrl": {
+            "type": "string",
+            "metadata": {
+                "description": "Nested templates base URL."
+            },
+            "defaultValue": "https://raw.githubusercontent.com/Azure/fedramp-iaas-webapp/master/nestedtemplates"
+        },
+        "dscBaseUrl": {
+            "type": "string",
+            "metadata": {
+                "description": "DSC Scripts base URL."
+            },
+            "defaultValue": "https://raw.githubusercontent.com/Azure/fedramp-iaas-webapp/master/DSC"
+        },
+        "scriptsBaseUrl": {
+            "type": "string",
+            "metadata": {
+                "description": "Custom Scripts base URL."
+            },
+            "defaultValue": "https://raw.githubusercontent.com/Azure/fedramp-iaas-webapp/master/custom-scripts"
+        },
+        "gatewaySkuName": {
+            "type": "string",
+            "defaultValue": "WAF_Medium",
+            "allowedValues": [
+                "Standard_Small",
+                "WAF_Medium",
+                "WAF_Large"
+            ],
+            "metadata": {
+                "description": "The type of gateway to be deployed with the blueprint."
+            }
+        }
+    },
+    "variables": {
+        "appID": "aadClientID",
+        "appSecret": "aadClientSecret",
+        "lbSettings": {
+            "rdpLBFEName": "rdpLBFE",
+            "adLBBEName": "adLBBE",
+            "rdpLBName": "rdpLoadBalancer",
+            "ipAddress": "10.200.1.5"
+        },
+        "wafSettings": {
+            "wafMode": "Prevention",
+            "wafRuleSetType": "OWASP",
+            "wafRuleSetVersion": "3.0",
+            "wafEnabled": true
+        },
+        "numberOfWebInstances": "[length(variables('vmSettings').web.ipAddresses)]",
+        "staticIPWEBStart": 5,
+        "RDPNAT": "RDP",
+        "omsSettings": {
+          "workspaceRegion": "USGov Virginia",
+          "serviceTier": "PerNode",
+          "dataRetention": 365
+        },
+        "vmSettings": {
+            "location": "[resourceGroup().location]",
+            "dc": {
+                "imagePublisher": "MicrosoftWindowsServer",
+                "imageOffer": "WindowsServer",
+                "imageSKU": "2016-Datacenter",
+                "ipAddressPDC": "10.200.0.5",
+                "ipAddressBDC": "10.200.0.6"
+            },
+            "web": {
+                "imagePublisher": "MicrosoftWindowsServer",
+                "imageOffer": "WindowsServer",
+                "imageSKU": "2016-Datacenter",
+                "staticIPWEBStart": 5,
+                "ipAddresses": [
+                    { "IpAddress": "10.200.2.5" },
+                    { "IpAddress": "10.200.2.6" }
+                ]
+            },
+            "mgt": {
+                "imagePublisher": "MicrosoftWindowsServer",
+                "imageOffer": "WindowsServer",
+                "imageSKU": "2016-Datacenter",
+                "ipAddress": "10.200.3.5"
+            },
+            "vmContainerName": "vhds"
+        },
+        "VnetID": "[resourceId('Microsoft.Network/virtualNetworks', variables('virtualNetworkNameWithSuffix'))]",
+        "derivedIds": {
+            "keyVaultUrl": "[concat('https://', parameters('keyVaultName') ,'.vault.usgovcloudapi.net/')]",
+            "keyVaultId": "[concat('/subscriptions/', subscription().subscriptionId, '/resourceGroups/', parameters('keyVaultResourceGroupName'), '/providers/Microsoft.KeyVault/vaults/', parameters('keyVaultName'))]",
+            "dcSubnet": "[concat(variables('VnetID'),'/subnets/', variables('subnets').dc.name)]",
+            "sqlSubnet": "[concat(variables('VnetID'),'/subnets/', variables('subnets').sql.name)]",
+            "webSubnet": "[concat(variables('VnetID'),'/subnets/', variables('subnets').web.name)]",
+            "mgtSubnet": "[concat(variables('VnetID'),'/subnets/', variables('subnets').mgt.name)]",
+            "dcNSG": "[resourceId('Microsoft.Network/networkSecurityGroups', variables('resourceNames').nsgs.dc)]",
+            "webNSG": "[resourceId('Microsoft.Network/networkSecurityGroups', variables('resourceNames').nsgs.web)]",
+            "lbNSG": "[resourceId('Microsoft.Network/networkSecurityGroups', variables('resourceNames').nsgs.lb)]",
+            "mgtNSG": "[resourceId('Microsoft.Network/networkSecurityGroups', variables('resourceNames').nsgs.mgt)]",
+            "sqlNSG": "[resourceId('Microsoft.Network/networkSecurityGroups', variables('resourceNames').nsgs.sql)]",
+            "adIPConfigID": "[concat(resourceId('Microsoft.Network/networkInterfaces',variables('resourceNames').nics.adpdc),'/ipConfigurations/ipconfig1')]",
+            "rdplbFEConfigID": "[concat(resourceId('Microsoft.Network/loadBalancers',variables('lbSettings').rdpLBName),'/frontendIPConfigurations/',variables('lbSettings').rdpLBFEName)]",
+            "adRDPNATRuleID": "[concat(resourceId('Microsoft.Network/loadBalancers',variables('lbSettings').rdpLBName),'/inboundNatRules/',variables('RDPNAT'))]",
+            "adBEAddressPoolID": "[concat(resourceId('Microsoft.Network/loadBalancers',variables('lbSettings').rdpLBName),'/backendAddressPools/',variables('lbSettings').adLBBEName)]"
+        },
+        "subnets":{
+          "dc": {
+              "name": "dc",
+              "properties": {
+                  "addressPrefix": "10.200.0.0/24"
+              }
+          },
+          "sql": {
+            "name": "sql",
+            "properties": {
+                "addressPrefix": "10.200.1.0/24"
+            }
+          },
+          "web": {
+              "name": "web",
+              "properties": {
+                  "addressPrefix": "10.200.2.0/24"
+              }
+          },
+          "mgt": {
+              "name": "mgt",
+              "properties": {
+                  "addressPrefix": "10.200.3.0/24"
+              }
+          },
+          "appGateway": {
+              "name": "appgateway",
+              "properties": {
+                  "addressPrefix": ""
+              }
+          }
+        },
+        "subnetArray": [
+            "[variables('subnets').dc]",
+            "[variables('subnets').sql]",
+            "[variables('subnets').web]",
+            "[variables('subnets').mgt]",
+            "[variables('subnets').appGateway]"
+        ],
+        "virtualNetworkAddressRange": "10.200.0.0/16",
+        "virtualNetworkNameWithSuffix": "[concat('autohav2VNET', uniqueString(resourceGroup().id))]",
+        "resourceNames": {
+            "gatewaySkuName": "WAF_Medium",
+            "omsWorkspace": "[substring(concat(uniqueString(resourceGroup().id), 'ws'), 5)]",
+            "automationAccount": "[substring(concat(uniqueString(resourceGroup().id), 'aa'), 5)]",
+            "recoveryServicesVault": "AZ-RCV-01",
+            "automationSchedule": "VM-Patching-Schedule",
+            "virtualNetworkNameWithSuffix": "[concat('autohav2VNET', uniqueString(resourceGroup().id))]",
+            "nsgs": {
+                "mgt": "MGTNSG",
+                "dc": "DCNSG",
+                "web": "WEBNSG",
+                "sql": "SQLNSG",
+                "lb": "LBNSG"
+            },
+            "storageAccounts": {
+                "dc": "[concat(uniqueString(resourceGroup().id), 'dc')]",
+                "web": "[concat(uniqueString(resourceGroup().id), 'web')]",
+                "mgt": "[concat(uniqueString(resourceGroup().id), 'mgt')]"
+            },
+            "vms": {
+                "adpdc": "TEST-prd-DC1-VM",
+                "adbdc": "TEST-prd-DC2-VM",
+                "web": "TEST-prd-APP-VM",
+                "mgt": "TEST-prd-MGT-VM",
+                "sql0" : "TEST-prd-SQL1-VM",
+                "sql1" : "TEST-prd-SQL1-VM"
+            },
+            "nics": {
+                "adpdc": "TEST-prd-DC1-nic",
+                "adbdc": "TEST-prd-DC2-nic",
+                "web": "TEST-prd-APP-nic",
+                "mgt": "TEST-prd-MGT-nic"
+            },
+            "loadBalancers": {
+                "rdpLBFEName": "rdpLBFE",
+                "adLBBEName": "adLBBE",
+                "rdpLBName": "rdpLoadBalancer"
+            },
+            "availabilitySets": {
+                "ad": "[concat('adAvailabilitySet')]",
+                "web": "[concat('webAvailabilitySet')]"
+            },
+            "publicIPs": {
+                "mgt": "mgtpublicip"
+            }
+        },
+        "artifacts": {
+            "provisioningStorageAccountsUrl": "[concat(parameters('templatesBaseUrl'),'/storageAccounts.json')]",
+            "provisioningVirtualMachinesUrl": "[concat(parameters('templatesBaseUrl'),'/virtualMachines.json')]",
+            "provisioningAvailabilitySetsUrl": "[concat(parameters('templatesBaseUrl'),'/availabilitySets.json')]",
+            "accountManagementPrincipalsUrl": "[concat(parameters('scriptsBaseUrl'),'/accountmanagementprincipals.ps1')]",
+            "provisioningOMSWorkspaceUrl": "[concat(parameters('templatesBaseUrl'),'/provisioningAutoAccOMSWorkspace.json')]",
+            "provisioningOMSAutomationScheduleUrl": "[concat(parameters('templatesBaseUrl'),'/provisioningAutomationSchedule.json')]",
+            "vnetwithDNSTemplateURL": "[concat(parameters('templatesBaseUrl'),'/updateVnetWithDNS.json')]",
+            "nicTemplateURL": "[concat(parameters('templatesBaseUrl'),'/updateNic.json')]",
+            "applicationGatewayURL": "[concat(parameters('templatesBaseUrl'),'/provisioningApplicationGateway.json')]",
+            "provisioningNetworkInterfacesUrl": "[concat(parameters('templatesBaseUrl'),'/networkInterfaces.json')]",
+            "virtualNetworkNSGURL": "[concat(parameters('templatesBaseUrl'),'/virtualNetworkNSG.json')]",
+            "provisionAndConfigureADUrl": "[concat(parameters('templatesBaseUrl'),'/provisionAndConfigureAD.json')]",
+            "configureMGTUrl": "[concat(parameters('templatesBaseUrl'),'/configureMGT.json')]",
+            "configureWEBUrl": "[concat(parameters('templatesBaseUrl'),'/configureWEB.json')]",
+            "provisioningRCV": "[concat(parameters('templatesBaseUrl'),'/recoveryServicesVault.json')]",
+            "backupPolicy": "[concat(parameters('templatesBaseUrl'),'/recoveryServicesBackupPolicy.json')]",
+            "configuringBackupADVMURL": "[concat(parameters('templatesBaseUrl'),'/configuringBackupADVM.json')]",
+            "provisioningOMSMonitoringUrl": "[concat(parameters('templatesBaseUrl'), '/provisioningOMSMonitoring.json') ]",
+            "pdcModulesURL": "[concat(parameters('dscBaseUrl'),'/PDCBaselineDSC.ps1.zip')]",
+            "pdcConfigurationFunction": "PDCBaselineDSC.ps1\\PDCBaselineDSC",
+            "bdcModulesURL": "[concat(parameters('dscBaseUrl'),'/BDCBaselineDSC.ps1.zip')]",
+            "bdcCreateConfigurationFunction": "BDCBaselineDSC.ps1\\BDCBaselineDSC",
+            "bdcConfigureConfigurationFunction": "BDCBaselineDSC.ps1\\BDCConfigureBaselineDSC",
+            "webModulesURL": "[concat(parameters('dscBaseUrl'),'/WEBBaselineDSC.ps1.zip')]",
+            "webConfigurationFunction": "WEBBaselineDSC.ps1\\WEBBaselineDSC",
+            "mgtModulesURL": "[concat(parameters('dscBaseUrl'),'/MGTBaselineDSC.ps1.zip')]",
+            "mgtConfigurationFunction": "MGTBaselineDSC.ps1\\MGTBaselineDSC"
+        },
+        "backupInfo": {
+            "rcVaultName": "[variables('resourceNames').recoveryServicesVault]",
+            "backupPolicy": "FedRAMPBackup",
+            "backupPolicyTemplateUrl": "[variables('artifacts').backupPolicy]",
+            "backupScheduleRunTimes": ["2017-05-09T23:00:00"],
+            "backupDailyRetentionDurationCount": 30,
+            "backupDaysOfTheWeek": ["Sunday"],
+            "backupWeeklyRetentionDurationCount": 104,
+            "backupMonthlyRetentionDurationCount": 36,
+            "backupMonthsOfYear": ["January"],
+            "backupYearlyRetentionDurationCount": 5
+        },
+        "vmEncryptionSettings": {
+            "sequenceVersion": "1.0",
+            "volumeType": "All",
+            "keyVaultResourceGroup": "[parameters('keyVaultResourceGroupName')]",
+            "diskEncryptionExtensionName": "AzureDiskEncryption",
+            "diskEncryptionExtensionVersion": "1.1",
+            "encryptionOperation": "EnableEncryption",
+            "keyEncryptionAlgorithm": "RSA-OAEP",
+            "keyVaultURL": "[concat('https://', parameters('keyVaultName'), '.vault.usgovcloudapi.net/')]",
+            "provisioningVMAzureDiskEncryptionUrl": "[concat(parameters('templatesBaseUrl'),'/configuringVMAzureDiskEncryption-kek','.json')]",
+            "keyVaultId": "[concat('/subscriptions/', subscription().subscriptionId, '/resourceGroups/', parameters('keyVaultResourceGroupName'), '/providers/Microsoft.KeyVault/vaults/', parameters('keyVaultName'))]",
+            "keyVaultResourceID": "[concat(subscription().id,'/resourceGroups/',parameters('keyVaultResourceGroupName'),'/providers/Microsoft.KeyVault/vaults/', parameters('keyVaultName'))]"
+        },
+        "antimalwareInfo": {
+            "exclusionPath": {
+                "web": ["c:\\Users"],
+                "ad": ["c:\\Users"],
+                "mgt": ["c:\\Users\\adminuser"]
+            },
+            "exclusionExtension": {
+                "web": [".txt", ".ps1"],
+                "ad": [".txt", ".ps1"],
+                "mgt": [".txt"]
+            },
+            "exclusionProcess": {
+                "web": ["w3wp.exe", "explorer.exe"],
+                "ad": ["w3wp.exe", "explorer.exe"],
+                "mgt": ["explorer.exe"]
+            },
+            "realTimeScanDirection": "Both",
+            "remediationScheduleDay": "Everyday",
+            "scanScheduleDay": "Everyday",
+            "disableRealtimeMonitoring": false
+        },
+        "vmNamesArraySQLMGT": {
+            "VMs": [
+                {
+                    "Name": "[variables('resourceNames').vms.mgt]"
+                },
+                {
+                    "Name": "[variables('resourceNames').vms.sql0]"
+                },
+                {
+                    "Name": "[variables('resourceNames').vms.sql1]"
+                }
+            ]
+        },
+        "vmNamesArrayAD": {
+            "VMs": [
+                {
+                    "Name": "[variables('resourceNames').vms.adpdc]"
+                },
+                {
+                    "Name": "[variables('resourceNames').vms.adbdc]"
+                }
+            ]
+        },
+        "vmNames": {
+            "VMs": [
+                {
+                    "Name": "TEST-prd-DC1-VM"
+                },
+                {
+                    "Name": "TEST-prd-DC2-VM"
+                },
+                {
+                    "Name": "%%APPVM0%%"
+                },
+                {
+                    "Name": "%%APPVM1%%"
+                },
+                {
+                    "Name": "TEST-prd-MGT-VM"
+                },
+                {
+                    "Name": "TEST-prd-SQL1-VM"
+                },
+                {
+                    "Name": "TEST-prd-SQL1-VM"
+                }
+            ]
+        }
+    },
+    "resources": [
+        {
+            "name": "ProvisionAutomationAccountAndOMSWorkspace",
+            "comments": "Creates an Azure Automation Account and OMS Workspace",
+            "type": "Microsoft.Resources/deployments",
+            "apiVersion": "2015-01-01",
+            "dependsOn": [
+            ],
+            "properties": {
+                "mode": "Incremental",
+                "templateLink": {
+                    "uri": "[variables('artifacts').provisioningOMSWorkspaceUrl]",
+                    "contentVersion": "1.0.0.0"
+                },
+                "parameters": {
+                    "omsWorkspaceName": {
+                        "value": "[variables('resourceNames').omsWorkspace]"
+                    },
+                    "omsWorkspaceRegion": {
+                        "value": "[variables('omsSettings').workspaceRegion]"
+                    },
+                    "serviceTier": {
+                        "value": "[variables('omsSettings').serviceTier]"
+                    },
+                    "dataRetention": {
+                        "value": "[variables('omsSettings').dataRetention]"
+                    },
+                    "omsAutomationAccountName": {
+                        "value": "[variables('resourceNames').automationAccount]"
+                    },
+                    "artifactsLocation": {
+                        "value": "[parameters('scriptsBaseUrl')]"
+                    }
+                }
+            }
+        },
+        {
+            "name": "ProvisionRecoveryServicesVault",
+            "comments": "Creates an Azure Recovery Services Vault",
+            "type": "Microsoft.Resources/deployments",
+            "apiVersion": "2015-01-01",
+            "dependsOn": [
+              "Microsoft.Resources/deployments/ProvisionAutomationAccountAndOMSWorkspace"
+            ],
+            "properties": {
+                "mode": "Incremental",
+                "templateLink": {
+                    "uri": "[variables('artifacts').provisioningRCV]",
+                    "contentVersion": "1.0.0.0"
+                },
+                "parameters": {
+                    "backupInfo": {
+                        "value": "[variables('backupInfo')]"
+                    }
+                }
+            }
+        },
+        {
+            "name": "ProvisionCustomBackup",
+            "type": "Microsoft.Resources/deployments",
+            "apiVersion": "2015-01-01",
+            "dependsOn": [
+                "Microsoft.Resources/deployments/ProvisionRecoveryServicesVault"
+            ],
+            "properties": {
+                "mode": "Incremental",
+                "templateLink": {
+                    "uri": "[variables('artifacts').backupPolicy]",
+                    "contentVersion": "1.0.0.0"
+                },
+                "parameters": {
+                    "backupInfo": {
+                        "value": "[variables('backupInfo')]"
+                    }
+                }
+            }
+        },
+        {
+        "apiVersion": "2017-05-10",
+        "name": "pid-1dd2b3cb-a191-44e3-82c0-9aec7457f754",
+        "comments": "GUID for tracking deployments intended for production use.",
+        "type": "Microsoft.Resources/deployments",
+        "properties": {
+            "mode": "Incremental",
+            "template": {
+                    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+                        "contentVersion": "1.0.0.0",
+                        "resources": []
+                }
+            }
+        },
+        {
+            "name": "ProvisionVirtualNetworkNSG",
+            "comments": "Creates Network Secuity Groups and a Virtual Network",
+            "type": "Microsoft.Resources/deployments",
+            "apiVersion": "2015-01-01",
+            "dependsOn": [
+                "Microsoft.Resources/deployments/ProvisionAutomationAccountAndOMSWorkspace"
+            ],
+            "properties": {
+                "mode": "Incremental",
+                "templateLink": {
+                    "uri": "[variables('artifacts').virtualNetworkNSGURL]",
+                    "contentVersion": "1.0.0.0"
+                },
+                "parameters": {
+                    "location": {
+                        "value": "[variables('vmSettings').location]"
+                    },
+                    "virtualNetworkName": {
+                        "value": "[variables('virtualNetworkNameWithSuffix')]"
+                    },
+                    "virtualNetworkAddressRange": {
+                        "value": "[variables('virtualNetworkAddressRange')]"
+                    },
+                    "subnets": {
+                        "value": "[variables('subnetArray')]"
+                    },
+                    "dcNSGName": {
+                        "value": "[variables('resourceNames').nsgs.dc]"
+                    },
+                    "sqlNSGName": {
+                        "value": "[variables('resourceNames').nsgs.sql]"
+                    },
+                    "webNSGName": {
+                        "value": "[variables('resourceNames').nsgs.web]"
+                    },
+                    "mgtNSGName": {
+                        "value": "[variables('resourceNames').nsgs.mgt]"
+                    },
+                    "lbNSGName": {
+                        "value": "[variables('resourceNames').nsgs.lb]"
+                    },
+                    "appGatewayAddressRange": {
+                        "value": "[variables('subnets').appGateway.properties.addressPrefix]"
+                    }
+                }
+            }
+        },
+        {
+            "name": "ProvisionStorageAccounts",
+            "type": "Microsoft.Resources/deployments",
+            "apiVersion": "2015-01-01",
+            "comments": "Creates storage accounts for the assets in the Active Directory, MGT, and WEB tiers.",
+            "dependsOn": [
+		        "Microsoft.Resources/deployments/ProvisionAutomationAccountAndOMSWorkspace"
+            ],
+            "properties": {
+                "mode": "Incremental",
+                "templateLink": {
+                    "uri": "[variables('artifacts').provisioningStorageAccountsUrl]",
+                    "contentVersion": "1.0.0.0"
+                },
+                "parameters": {
+                    "location": {
+                        "value": "[variables('vmSettings').location]"
+                    },
+                    "webStorageAccountName": {
+                        "value": "[variables('resourceNames').storageAccounts.web]"
+                    },
+                    "StorageAccountType": {
+                        "value": "[parameters('StorageAccountType')]"
+                    },
+                    "dcStorageAccountName": {
+                        "value": "[variables('resourceNames').storageAccounts.dc]"
+                    },
+                    "omsWorkspaceName": {
+                        "value": "[variables('resourceNames').omsWorkspace]"
+                    },
+                    "mgtStorageAccountName": {
+                        "value": "[variables('resourceNames').storageAccounts.mgt]"
+                    }
+                }
+            }
+        },
+        {
+            "name": "ProvisionAvailabilitySets",
+            "type": "Microsoft.Resources/deployments",
+            "apiVersion": "2015-01-01",
+            "comments": "Creates Availability Sets for the Active Directory and Web tiers.",
+            "dependsOn": [
+            ],
+            "properties": {
+                "mode": "Incremental",
+                "templateLink": {
+                    "uri": "[variables('artifacts').provisioningAvailabilitySetsUrl]",
+                    "contentVersion": "1.0.0.0"
+                },
+                "parameters": {
+                    "location": {
+                        "value": "[variables('vmSettings').location]"
+                    },
+                    "adAvailabilitySetName": {
+                        "value": "[variables('resourceNames').availabilitySets.ad]"
+                    },
+                    "webAvailabilitySetName": {
+                        "value": "[variables('resourceNames').availabilitySets.web]"
+                    }
+                }
+            }
+        },
+        {
+            "name": "ProvisionAndConfigureAD",
+            "type": "Microsoft.Resources/deployments",
+            "comments": "Creates and configures Active Directory VMs, Network Interfaces, and the domain in the Active Directory tier.",
+            "apiVersion": "2015-01-01",
+            "dependsOn": [
+                "Microsoft.Resources/deployments/ProvisionAvailabilitySets",
+                "Microsoft.Resources/deployments/ProvisionStorageAccounts",
+                "Microsoft.Resources/deployments/ProvisionVirtualNetworkNSG"
+            ],
+            "properties": {
+                "mode": "Incremental",
+                "templateLink": {
+                    "uri": "[variables('artifacts').provisionAndConfigureADUrl]",
+                    "contentVersion": "1.0.0.0"
+                },
+            "parameters": {
+                "adPDCVMName": {
+                  "value": "[variables('resourceNames').vms.adpdc]"
+                },
+                "dcStorageAccountName": {
+                  "value": "[variables('resourceNames').storageAccounts.dc]"
+                },
+                "dcSubnetRef": {
+                  "value": "[variables('derivedIds').dcSubnet]"
+                },
+                "dcNSGid": {
+                  "value": "[variables('derivedIds').dcNSG]"
+                },
+                "adAvailabilitySetName": {
+                  "value": "[variables('resourceNames').availabilitySets.ad]"
+                },
+                "adVMSize": {
+                  "value": "[parameters('adVMSize')]"
+                },
+                "adminUsername": {
+                  "reference": {
+                    "keyVault": {
+                      "id": "[variables('derivedIds').keyVaultId]"
+                    },
+                    "secretName": "adminUsername"
+                  }
+                },
+                "adminPassword": {
+                  "reference": {
+                    "keyVault": {
+                      "id": "[variables('derivedIds').keyVaultId]"
+                    },
+                    "secretName": "adminPassword"
+                  }
+                },
+                "adImagePublisher": {
+                  "value": "[variables('vmSettings').dc.imagePublisher]"
+                },
+                "adImageOffer": {
+                  "value": "[variables('vmSettings').dc.imageOffer]"
+                },
+                "adImageSKU": {
+                  "value": "[variables('vmSettings').dc.imageSKU]"
+                },
+                "adPDCNicName": {
+                  "value": "[variables('resourceNames').nics.adpdc]"
+                },
+                "pdcConfigurationFunction": {
+                  "value": "[variables('artifacts').pdcConfigurationFunction]"
+                },
+                "pdcModulesURL": {
+                  "value": "[variables('artifacts').pdcModulesURL]"
+                },
+                "adBDCVMName": {
+                  "value": "[variables('resourceNames').vms.adbdc]"
+                },
+                "adBDCNicName": {
+                  "value": "[variables('resourceNames').nics.adbdc]"
+                },
+                "location": {
+                  "value": "[variables('vmSettings').location]"
+                },
+                "vmContainerName": {
+                  "value": "[variables('vmSettings').vmContainerName]"
+                },
+                "domainName": {
+                  "reference": {
+                    "keyVault": {
+                      "id": "[variables('derivedIds').keyVaultId]"
+                    },
+                    "secretName": "domain"
+                  }
+                },
+                "updateVnetWithDNSTemplateURL": {
+                  "value": "[variables('artifacts').vnetwithDNSTemplateURL]"
+                },
+                "virtualNetworkNameWithSuffix": {
+                  "value": "[variables('resourceNames').virtualNetworkNameWithSuffix]"
+                },
+                "virtualNetworkAddressRange": {
+                  "value": "[variables('virtualNetworkAddressRange')]"
+                },
+                "subnets": {
+                  "value": "[variables('subnetArray')]"
+                },
+                "adPDCNICIPAddress": {
+                  "value": "[variables('vmSettings').dc.ipAddressPDC]"
+                },
+                "bdcCreateConfigurationFunction": {
+                  "value": "[variables('artifacts').bdcCreateConfigurationFunction]"
+                },
+                "bdcConfigureConfigurationFunction": {
+                  "value": "[variables('artifacts').bdcConfigureConfigurationFunction]"
+                },
+                "bdcModulesURL": {
+                  "value": "[variables('artifacts').bdcModulesURL]"
+                },
+                "configuringBackupADVMURL": {
+                  "value": "[variables('artifacts').configuringBackupADVMURL]"
+                },
+                "adBDCNICIPAddress": {
+                  "value": "[variables('vmSettings').dc.ipAddressBDC]"
+                },
+                "updateNicTemplateURL": {
+                  "value": "[variables('artifacts').nicTemplateURL]"
+                },
+                "keyVaultName": {
+                  "value": "[parameters('keyVaultName')]"
+                },
+                "vmEncryptionSettings": {
+                  "value": "[variables('vmEncryptionSettings')]"
+                },
+                "antimalwareInfo": {
+                  "value": "[variables('antimalwareInfo')]"
+                },
+                "workspaceName": {
+                  "value": "[variables('resourceNames').omsWorkspace]"
+                },
+                "AutomationAccountName": {
+                  "value": "[variables('resourceNames').automationAccount]"
+                },
+                "EnvironmentName": {
+                  "value": "[parameters('EnvironmentName')]"
+                },
+                "ResourceGroupName": {
+                  "value": "[resourceGroup().name]"
+                },
+                "SubscriptionId": {
+                  "value": "[subscription().subscriptionId]"
+                }
+              }
+            }
+        },
+        {
+            "name": "[concat('ConfigureOMSMonitoringAD-', variables('vmNamesArrayAD').VMs[copyIndex()].Name)]",
+            "comments": "Creates OMS Monitoring Extension for Active Directory tier VMs.",
+            "type": "Microsoft.Resources/deployments",
+            "apiVersion": "2015-01-01",
+            "dependsOn": [
+                "ProvisionAndConfigureAD"
+            ],
+            "copy": {
+                "name": "monitorVMLoopAD",
+                "count": "[length(variables('vmNamesArrayAD').VMs)]"
+            },
+            "properties": {
+                "mode": "Incremental",
+                "templateLink": {
+                    "uri": "[variables('artifacts').provisioningOMSMonitoringUrl]",
+                    "contentVersion": "1.0.0.0"
+                },
+                "parameters": {
+                    "vmName": {
+                        "value": "[variables('vmNamesArrayAD').VMs[copyIndex()].Name]"
+                    },
+                    "workspaceName": {
+                        "value": "[variables('resourceNames').omsWorkspace]"
+                    },
+                    "AutomationAccountName": {
+                        "value": "[variables('resourceNames').automationAccount]"
+                    },
+                    "EnvironmentName": {
+                        "value": "[parameters('EnvironmentName')]"
+                    },
+                    "SubscriptionId": {
+                        "value": "[subscription().subscriptionId]"
+                    },
+                    "ResourceGroupName": {
+                        "value": "[resourceGroup().name]"
+                    },
+                    "accountManagementPrincipalsUrl": {
+                        "value": "[variables('artifacts').accountManagementPrincipalsUrl]"
+                    },
+                    "MachinesToSetPasswordPolicy": {
+                        "value": "[concat(variables('resourceNames').vms.adpdc,';', variables('resourceNames').vms.adbdc)]"
+                    },
+                    "location": {
+                        "value": "[variables('vmSettings').location]"
+                    },
+                    "domainName": {
+                      "reference": {
+                        "keyVault": {
+                          "id": "[variables('derivedIds').keyVaultId]"
+                        },
+                        "secretName": "domain"
+                      }
+                    }
+                }
+            }
+        },
+        {
+            "name": "ProvisionNICs",
+            "comments": "Creates Network Interfaces for all VMs in the AD, WEB, and MGT tiers.",
+            "type": "Microsoft.Resources/deployments",
+            "apiVersion": "2015-01-01",
+            "dependsOn": [
+                "Microsoft.Resources/deployments/ProvisionAndConfigureAD"
+            ],
+            "properties": {
+                "mode": "Incremental",
+                "templateLink": {
+                    "uri": "[variables('artifacts').provisioningNetworkInterfacesUrl]",
+                    "contentVersion": "1.0.0.0"
+                },
+                "parameters": {
+                    "location": {
+                        "value": "[variables('vmSettings').location]"
+                    },
+                    "adPDCNicName": {
+                        "value": "[variables('resourceNames').nics.adpdc]"
+                    },
+                    "adPDCNICIPAddress": {
+                        "value": "[variables('vmSettings').dc.ipAddressPDC]"
+                    },
+                    "dcSubnetRef": {
+                        "value": "[variables('derivedIds').dcSubnet]"
+                    },
+                    "mgtSubnetRef": {
+                        "value": "[variables('derivedIds').mgtSubnet]"
+                    },
+                    "adBEAddressPoolID": {
+                        "value": "[variables('derivedIds').adBEAddressPoolID]"
+                    },
+                    "adRDPNATRuleID": {
+                        "value": "[variables('derivedIds').adRDPNATRuleID]"
+                    },
+                    "adBDCNicName": {
+                        "value": "[variables('resourceNames').nics.adbdc]"
+                    },
+                    "adBDCNICIPAddress": {
+                        "value": "[variables('vmSettings').dc.ipAddressBDC]"
+                    },
+                    "dcNSGid": {
+                        "value": "[variables('derivedIds').dcNSG]"
+                    },
+                    "mgtNICName": {
+                        "value": "[variables('resourceNames').nics.mgt]"
+                    },
+                    "mgtIPAddress": {
+                        "value": "[variables('vmSettings').mgt.ipAddress]"
+                    },
+                    "mgtNSGid": {
+                        "value": "[variables('derivedIds').mgtNSG]"
+                    },
+                    "mgtPublicIPName": {
+                        "value": "[variables('resourceNames').publicIPs.mgt]"
+                    },
+                    "ipAddressArray": {
+                      "value": "[variables('vmSettings').web.ipAddresses]"
+                    },
+                    "webNICName": {
+                        "value": "[variables('resourceNames').nics.web]"
+                    },
+                    "webNSGid": {
+                        "value": "[variables('derivedIds').webNSG]"
+                    },
+                    "staticIPWEBStart": {
+                        "value": "[variables('staticIPWEBStart')]"
+                    },
+                    "subnetRef": {
+                        "value": "[variables('derivedIds').webSubnet]"
+                    },
+                    "webSubnetAddressRange": {
+                        "value": "[variables('subnets').web.properties.addressPrefix]"
+                    }
+                }
+            }
+        },
+        {
+            "name": "ProvisionApplicationGateway",
+            "comments": "Creates Application Gateway with WAF settings enabled.",
+            "type": "Microsoft.Resources/deployments",
+            "apiVersion": "2015-01-01",
+            "dependsOn": [
+                "Microsoft.Resources/deployments/ProvisionNICs"
+            ],
+            "properties": {
+                "mode": "Incremental",
+                "templateLink": {
+                    "uri": "[variables('artifacts').applicationGatewayURL]",
+                    "contentVersion": "1.0.0.0"
+                },
+                "parameters": {
+                    "addressPrefix": {
+                        "value": "[variables('virtualNetworkAddressRange')]"
+                    },
+                    "virtualNetworkName": {
+                        "value": "[variables('resourceNames').virtualNetworkNameWithSuffix]"
+                    },
+                    "vmLocation": {
+                        "value": "[variables('vmSettings').location]"
+                    },
+                    "subnetPrefix": {
+                        "value": "[variables('subnets').appGateway.properties.addressPrefix]"
+                    },
+                    "skuName": {
+                        "value": "[variables('resourceNames').gatewaySkuName]"
+                    },
+                    "capacity": {
+                        "value": "[variables('numberOfWebInstances')]"
+                    },
+                    "backendIpsForPathRuleWEB": {
+                        "value": "[variables('vmSettings').web.ipAddresses]"
+                    },
+                    "pathMatch1": {
+                        "value": "/WEB"
+                    },
+                    "subnetName": {
+                        "value": "[variables('subnets').appGateway.name]"
+                    },
+                    "wafEnabled": {
+                        "value": "[variables('wafSettings').wafEnabled]"
+                    },
+                    "wafMode": {
+                        "value": "[variables('wafSettings').wafMode]"
+                    },
+                    "wafRuleSetType": {
+                        "value": "[variables('wafSettings').wafRuleSetType]"
+                    },
+                    "wafRuleSetVersion": {
+                        "value": "[variables('wafSettings').wafRuleSetVersion]"
+                    },
+                    "certData": {
+                      "reference": {
+                        "keyVault": {
+                          "id": "[variables('derivedIds').keyVaultId]"
+                        },
+                        "secretName": "sslCert"
+                      }
+                    },
+                    "certPassword": {
+                      "reference": {
+                        "keyVault": {
+                          "id": "[variables('derivedIds').keyVaultId]"
+                        },
+                        "secretName": "sslPassword"
+                      }
+                    }
+                }
+            }
+        },
+        {
+            "name": "ProvisionVirtualMachines",
+            "type": "Microsoft.Resources/deployments",
+            "apiVersion": "2015-01-01",
+            "comments": "Creates WEB and MGT VMs. The number of WEB VMs is determined by the numberOfWebInstances parameter.",
+            "dependsOn": [
+                "Microsoft.Resources/deployments/ProvisionNICs",
+                "Microsoft.Resources/deployments/ProvisionStorageAccounts",
+                "Microsoft.Resources/deployments/ProvisionAvailabilitySets",
+                "Microsoft.Resources/deployments/ProvisionAndConfigureAD"
+            ],
+            "properties": {
+                "mode": "Incremental",
+                "templateLink": {
+                    "uri": "[variables('artifacts').provisioningVirtualMachinesUrl]",
+                    "contentVersion": "1.0.0.0"
+                },
+                "parameters": {
+                  "location": {
+                      "value": "[variables('vmSettings').location]"
+                  },
+                  "numberOfWebInstances": {
+                      "value": "[variables('numberOfWebInstances')]"
+                  },
+                  "WebVMName": {
+                      "value": "[variables('resourceNames').vms.web]"
+                  },
+                  "WebStorageAccountName": {
+                      "value": "[variables('resourceNames').storageAccounts.web]"
+                  },
+                  "WebVMSize": {
+                      "value": "[parameters('webVMSize')]"
+                  },
+                  "webNICName": {
+                      "value": "[variables('resourceNames').nics.web]"
+                  },
+                  "appImagePublisher": {
+                      "value": "[variables('vmSettings').web.imagePublisher]"
+                  },
+                  "appImageOffer": {
+                      "value": "[variables('vmSettings').web.imageOffer]"
+                  },
+                  "appImageSKU": {
+                      "value": "[variables('vmSettings').web.imageSKU]"
+                  },
+                  "webAvailabilitySetName": {
+                      "value": "[variables('resourceNames').availabilitySets.web]"
+                  },
+                  "adAvailabilitySetName": {
+                      "value": "[variables('resourceNames').availabilitySets.ad]"
+                  },
+                  "adPDCVMName": {
+                      "value": "[variables('resourceNames').vms.adpdc]"
+                  },
+                  "adVMSize": {
+                      "value": "[parameters('adVMSize')]"
+                  },
+                  "adminUsername": {
+                    "reference": {
+                      "keyVault": {
+                        "id": "[variables('derivedIds').keyVaultId]"
+                      },
+                      "secretName": "adminUsername"
+                    }
+                  },
+                  "adminPassword": {
+                      "reference": {
+                          "keyVault": {
+                              "id": "[variables('derivedIds').keyVaultId]"
+                          },
+                          "secretName": "adminPassword"
+                      }
+                  },
+                  "adImagePublisher": {
+                      "value": "[variables('vmSettings').dc.imagePublisher]"
+                  },
+                  "adImageOffer": {
+                      "value": "[variables('vmSettings').dc.imageOffer]"
+                  },
+                  "adImageSKU": {
+                      "value": "[variables('vmSettings').dc.imageSKU]"
+                  },
+                  "adPDCNicName": {
+                      "value": "[variables('resourceNames').nics.adpdc]"
+                  },
+                  "adBDCVMName": {
+                      "value": "[variables('resourceNames').vms.adbdc]"
+                  },
+                  "adBDCNicName": {
+                      "value": "[variables('resourceNames').nics.adbdc]"
+                  },
+                  "dcStorageAccountName": {
+                      "value": "[variables('resourceNames').storageAccounts.dc]"
+                  },
+                  "mgtStorageAccountName": {
+                      "value": "[variables('resourceNames').storageAccounts.mgt]"
+                  },
+                  "vmContainerName": {
+                      "value": "[variables('vmSettings').vmContainerName]"
+                  },
+                  "mgtImagePublisher": {
+                      "value": "[variables('vmSettings').mgt.imagePublisher]"
+                  },
+                  "mgtImageOffer": {
+                      "value": "[variables('vmSettings').mgt.imageOffer]"
+                  },
+                  "mgtImageSKU": {
+                      "value": "[variables('vmSettings').mgt.imageSKU]"
+                  },
+                  "domainName": {
+                    "reference": {
+                      "keyVault": {
+                        "id": "[variables('derivedIds').keyVaultId]"
+                      },
+                      "secretName": "domain"
+                    }
+                  },
+                  "mgtVMName": {
+                      "value": "[variables('resourceNames').vms.mgt]"
+                  },
+                  "mgtVMSize": {
+                      "value": "[parameters('mgtVMSize')]"
+                  },
+                  "mgtNICName": {
+                      "value": "[variables('resourceNames').nics.mgt]"
+                  }
+                }
+            }
+        },
+        {
+            "name": "ConfigureMGT",
+            "type": "Microsoft.Resources/deployments",
+            "apiVersion": "2015-01-01",
+            "comments": "Configures MGT VM with custom settings.",
+            "dependsOn": [
+                "Microsoft.Resources/deployments/ProvisionVirtualMachines",
+                "monitorVMLoopAD"
+            ],
+            "properties": {
+                "mode": "Incremental",
+                "templateLink": {
+                    "uri": "[variables('artifacts').configureMGTUrl]",
+                    "contentVersion": "1.0.0.0"
+                },
+                "parameters": {
+                  "mgtVMName": {
+                      "value": "[variables('resourceNames').vms.mgt]"
+                  },
+                  "location": {
+                      "value": "[variables('vmSettings').location]"
+                  },
+                  "domainName": {
+                    "reference": {
+                      "keyVault": {
+                        "id": "[variables('derivedIds').keyVaultId]"
+                      },
+                      "secretName": "domain"
+                    }
+                  },
+                  "adminUsername": {
+                    "reference": {
+                      "keyVault": {
+                        "id": "[variables('derivedIds').keyVaultId]"
+                      },
+                      "secretName": "adminUsername"
+                    }
+                  },
+                  "adminPassword": {
+                    "reference": {
+                        "keyVault": {
+                            "id": "[variables('derivedIds').keyVaultId]"
+                        },
+                        "secretName": "adminPassword"
+                    }
+                  },
+                  "mgtModulesURL": {
+                      "value": "[variables('artifacts').mgtModulesURL]"
+                  },
+                  "antimalwareInfo": {
+                      "value": "[variables('antimalwareInfo')]"
+                  },
+                  "mgtConfigurationFunction": {
+                      "value": "[variables('artifacts').mgtConfigurationFunction]"
+                  },
+                  "vmEncryptionSettings": {
+                      "value": "[variables('vmEncryptionSettings')]"
+                  },
+                  "keyVaultName": {
+                      "value": "[parameters('keyVaultName')]"
+                  },
+                  "workspaceName": {
+                      "value": "[variables('resourceNames').omsWorkspace]"
+                  },
+                  "AutomationAccountName": {
+                      "value": "[variables('resourceNames').automationAccount]"
+                  },
+                  "EnvironmentName": {
+                      "value": "[parameters('EnvironmentName')]"
+                  },
+                  "ResourceGroupName": {
+                      "value": "[resourceGroup().name]"
+                  },
+                  "SubscriptionId": {
+                      "value": "[subscription().subscriptionId]"
+                  }
+                }
+            }
+        },
+        {
+            "name": "ConfigureWEB",
+            "comments": "Configures WEB VMs with custom settings.",
+            "type": "Microsoft.Resources/deployments",
+            "apiVersion": "2015-01-01",
+            "dependsOn": [
+                "Microsoft.Resources/deployments/ProvisionVirtualMachines",
+                "monitorVMLoopAD"
+            ],
+            "properties": {
+                "mode": "Incremental",
+                "templateLink": {
+                    "uri": "[variables('artifacts').configureWEBUrl]",
+                    "contentVersion": "1.0.0.0"
+                },
+                "parameters": {
+                    "numberOfWebInstances": {
+                        "value": "[variables('numberOfWebInstances')]"
+                    },
+                    "WebVMName": {
+                        "value": "[variables('resourceNames').vms.web]"
+                    },
+                    "WebAvailabilitySetName": {
+                        "value": "[variables('resourceNames').availabilitySets.web]"
+                    },
+                    "WebStorageAccountName": {
+                        "value": "[variables('resourceNames').storageAccounts.web]"
+                    },
+                    "StorageAccountType": {
+                        "value": "[parameters('StorageAccountType')]"
+                    },
+                    "location": {
+                        "value": "[variables('vmSettings').location]"
+                    },
+                    "WebVMSize": {
+                        "value": "[parameters('webVMSize')]"
+                    },
+                    "adminUsername": {
+                      "reference": {
+                        "keyVault": {
+                          "id": "[variables('derivedIds').keyVaultId]"
+                        },
+                        "secretName": "adminUsername"
+                      }
+                    },
+                    "adminPassword": {
+                        "reference": {
+                            "keyVault": {
+                                "id": "[variables('derivedIds').keyVaultId]"
+                            },
+                            "secretName": "adminPassword"
+                        }
+                    },
+                    "appImagePublisher": {
+                        "value": "[variables('vmSettings').web.imagePublisher]"
+                    },
+                    "appImageOffer": {
+                        "value": "[variables('vmSettings').web.imageOffer]"
+                    },
+                    "appImageSKU": {
+                        "value": "[variables('vmSettings').web.imageSKU]"
+                    },
+                    "vmContainerName": {
+                        "value": "[variables('vmSettings').vmContainerName]"
+                    },
+                    "WEBNICName": {
+                        "value": "[variables('resourceNames').nics.web]"
+                    },
+                    "subnetRef": {
+                        "value": "[variables('derivedIds').webSubnet]"
+                    },
+                    "webNSGid": {
+                        "value": "[variables('derivedIds').webNSG]"
+                    },
+                    "domainName": {
+                      "reference": {
+                        "keyVault": {
+                          "id": "[variables('derivedIds').keyVaultId]"
+                        },
+                        "secretName": "domain"
+                      }
+                    },
+                    "webModulesURL": {
+                        "value": "[variables('artifacts').webModulesURL]"
+                    },
+                    "webConfigurationFunction": {
+                        "value": "[variables('artifacts').webConfigurationFunction]"
+                    },
+                    "staticIPWEBStart": {
+                        "value": "[variables('staticIPWEBStart')]"
+                    },
+                    "webSubnetAddressRange": {
+                        "value": "[variables('subnets').web.properties.addressPrefix]"
+                    },
+                    "keyVaultName": {
+                        "value": "[parameters('keyVaultName')]"
+                    },
+                    "vmEncryptionSettings": {
+                        "value": "[variables('vmEncryptionSettings')]"
+                    },
+                    "antimalwareInfo": {
+                        "value": "[variables('antimalwareInfo')]"
+                    },
+                    "workspaceName": {
+                        "value": "[variables('resourceNames').omsWorkspace]"
+                    },
+                    "AutomationAccountName": {
+                        "value": "[variables('resourceNames').automationAccount]"
+                    },
+                    "EnvironmentName": {
+                        "value": "[parameters('EnvironmentName')]"
+                    },
+                    "SubscriptionId": {
+                        "value": "[subscription().subscriptionId]"
+                    },
+                    "ResourceGroupName": {
+                        "value": "[resourceGroup().name]"
+                    },
+                    "omsWorkspaceName": {
+                        "value": "[variables('resourceNames').omsWorkspace]"
+                    }
+                }
+            }
+        },
+        {
+            "name": "[concat('ConfigureOMSMonitoringSQLMGT-', variables('vmNamesArraySQLMGT').VMs[copyIndex()].Name)]",
+            "comments": "Creates OMS Monitoring Extension for the Active Directory and MGT tiers.",
+            "type": "Microsoft.Resources/deployments",
+            "apiVersion": "2015-01-01",
+            "dependsOn": [
+                "monitorVMLoopAD",
+                "ConfigureMGT",
+                "ConfigureSQL"
+            ],
+            "copy": {
+                "name": "monitorVMLoopSQLAD",
+                "count": "[length(variables('vmNamesArraySQLMGT').VMs)]"
+            },
+            "properties": {
+                "mode": "Incremental",
+                "templateLink": {
+                    "uri": "[variables('artifacts').provisioningOMSMonitoringUrl]",
+                    "contentVersion": "1.0.0.0"
+                },
+                "parameters": {
+                    "vmName": {
+                        "value": "[variables('vmNamesArraySQLMGT').VMs[copyIndex()].Name]"
+                    },
+                    "workspaceName": {
+                        "value": "[variables('resourceNames').omsWorkspace]"
+                    },
+                    "AutomationAccountName": {
+                        "value": "[variables('resourceNames').automationAccount]"
+                    },
+                    "EnvironmentName": {
+                        "value": "[parameters('EnvironmentName')]"
+                    },
+                    "SubscriptionId": {
+                        "value": "[subscription().subscriptionId]"
+                    },
+                    "ResourceGroupName": {
+                        "value": "[resourceGroup().name]"
+                    },
+                    "accountManagementPrincipalsUrl": {
+                        "value": "[variables('artifacts').accountManagementPrincipalsUrl]"
+                    },
+                    "MachinesToSetPasswordPolicy": {
+                        "value": "[concat(variables('resourceNames').vms.adpdc,';', variables('resourceNames').vms.adbdc)]"
+                    },
+                    "location": {
+                        "value": "[variables('vmSettings').location]"
+                    },
+                    "domainName": {
+                      "reference": {
+                        "keyVault": {
+                          "id": "[variables('derivedIds').keyVaultId]"
+                        },
+                        "secretName": "domain"
+                      }
+                    }
+                }
+            }
+        },
+        {
+            "name": "[concat('ConfigureOMSMonitoringWEB-', variables('resourceNames').vms.web, copyindex())]",
+            "comments": "Creates the OMS Monitoring Extension for the WEB tier.",
+            "type": "Microsoft.Resources/deployments",
+            "apiVersion": "2015-01-01",
+            "dependsOn": [
+                "monitorVMLoopAD",
+                "ConfigureWEB"
+            ],
+            "copy": {
+                "name": "monitorVMLoopWEB",
+                "count": "[variables('numberOfWebInstances')]"
+            },
+            "properties": {
+                "mode": "Incremental",
+                "templateLink": {
+                    "uri": "[variables('artifacts').provisioningOMSMonitoringUrl]",
+                    "contentVersion": "1.0.0.0"
+                },
+                "parameters": {
+                    "vmName": {
+                        "value": "[concat(variables('resourceNames').vms.web, copyindex())]"
+                    },
+                    "workspaceName": {
+                        "value": "[variables('resourceNames').omsWorkspace]"
+                    },
+                    "AutomationAccountName": {
+                        "value": "[variables('resourceNames').automationAccount]"
+                    },
+                    "EnvironmentName": {
+                        "value": "[parameters('EnvironmentName')]"
+                    },
+                    "SubscriptionId": {
+                        "value": "[subscription().subscriptionId]"
+                    },
+                    "ResourceGroupName": {
+                        "value": "[resourceGroup().name]"
+                    },
+                    "accountManagementPrincipalsUrl": {
+                        "value": "[variables('artifacts').accountManagementPrincipalsUrl]"
+                    },
+                    "MachinesToSetPasswordPolicy": {
+                        "value": ""
+                    },
+                    "location": {
+                        "value": "[variables('vmSettings').location]"
+                    },
+                    "DomainName": {
+                      "reference": {
+                        "keyVault": {
+                          "id": "[variables('derivedIds').keyVaultId]"
+                        },
+                        "secretName": "domain"
+                      }
+                    }
+                }
+            }
+        },
+        {
+            "name": "ConfigureAutomationSchedules",
+            "comments": "Configures patching automation schedules.",
+            "type": "Microsoft.Resources/deployments",
+            "apiVersion": "2015-01-01",
+            "dependsOn": [
+                "monitorVMLoopSQLAD",
+                "monitorVMLoopWEB",
+                "ConfigureSQL"
+            ],
+            "properties": {
+                "mode": "Incremental",
+                "templateLink": {
+                    "uri": "[variables('artifacts').provisioningOMSAutomationScheduleUrl]",
+                    "contentVersion": "1.0.0.0"
+                },
+                "parameters": {
+                    "omsAutomationAccountName": {
+                        "value": "[variables('resourceNames').automationAccount]"
+                    },
+                    "scheduleName": {
+                        "value": "[variables('resourceNames').automationSchedule]"
+                    },
+                    "scheduleJobGuid": {
+                      "reference": {
+                          "keyVault": {
+                              "id": "[variables('derivedIds').keyVaultId]"
+                          },
+                          "secretName": "guid"
+                      }
+                    },
+                    "computerIdList": {
+                        "value": ""
+                    }
+                }
+            }
+        },
+        {
+            "name": "[concat('ConfigureVMEncryption-', variables('resourceNames').vms.web, copyindex())]",
+            "type": "Microsoft.Resources/deployments",
+            "apiVersion": "2015-01-01",
+            "dependsOn": [
+                  "ConfigureAutomationSchedules",
+		  "ConfigureWEB"
+            ],
+            "copy": {
+                "name": "encryptionWEBLoop",
+                "count": "[variables('numberOfWebInstances')]"
+            },
+            "properties": {
+                "mode": "Incremental",
+                "templateLink": {
+                    "uri": "[variables('vmEncryptionSettings').provisioningVMAzureDiskEncryptionUrl]",
+                    "contentVersion": "1.0.0.0"
+                },
+                "parameters": {
+                    "vmName": {
+                        "value": "[concat(variables('resourceNames').vms.web, copyindex())]"
+                    },
+                    "keyVaultName": {
+                        "value": "[parameters('keyVaultName')]"
+                    },
+                    "vmEncryptionSettings": {
+                        "value": "[variables('vmEncryptionSettings')]"
+                    },
+                    "aadClientID": {
+                        "reference": {
+                            "keyVault": {
+                                "id": "[variables('vmEncryptionSettings').keyVaultId]"
+                            },
+                            "secretName": "aadClientID"
+                        }
+                    },
+                    "aadClientSecret": {
+                        "reference": {
+                            "keyVault": {
+                                "id": "[variables('vmEncryptionSettings').keyVaultId]"
+                            },
+                            "secretName": "aadClientSecret"
+                        }
+                    },
+                    "keyEncryptionKeyURL": {
+                        "reference": {
+                            "keyVault": {
+                                "id": "[variables('vmEncryptionSettings').keyVaultId]"
+                            },
+                            "secretName": "keyEncryptionKeyURL"
+                        }
+                    },
+                    "workspaceName": {
+                        "value": "[variables('resourceNames').omsWorkspace]"
+                    },
+                    "AutomationAccountName": {
+                        "value": "[variables('resourceNames').automationAccount]"
+                    },
+                    "EnvironmentName": {
+                        "value": "[parameters('EnvironmentName')]"
+                    },
+                    "ResourceGroupName": {
+                        "value": "[resourceGroup().name]"
+                    },
+                    "SubscriptionId": {
+                        "value": "[subscription().subscriptionId]"
+                    }
+                }
+            }
+        },
+        {
+            "name": "[concat('ConfigureVMEncryption-', variables('vmNamesArrayAD').VMs[copyIndex()].Name)]",
+            "type": "Microsoft.Resources/deployments",
+            "apiVersion": "2015-01-01",
+            "dependsOn": [
+                "ConfigureAutomationSchedules",
+		"[concat('ConfigureVMEncryption-', variables('resourceNames').vms.web, copyindex())]"
+            ],
+            "copy": {
+                "name": "encryptionADLoop",
+                "count": "[length(variables('vmNamesArrayAD').VMs)]"
+            },
+            "properties": {
+                "mode": "Incremental",
+                "templateLink": {
+                    "uri": "[variables('vmEncryptionSettings').provisioningVMAzureDiskEncryptionUrl]",
+                    "contentVersion": "1.0.0.0"
+                },
+                "parameters": {
+                    "vmName": {
+                        "value": "[variables('vmNamesArrayAD').VMs[copyIndex()].Name]"
+                    },
+                    "keyVaultName": {
+                        "value": "[parameters('keyVaultName')]"
+                    },
+                    "vmEncryptionSettings": {
+                        "value": "[variables('vmEncryptionSettings')]"
+                    },
+                    "aadClientID": {
+                        "reference": {
+                            "keyVault": {
+                                "id": "[variables('vmEncryptionSettings').keyVaultId]"
+                            },
+                            "secretName": "aadClientID"
+                        }
+                    },
+                    "aadClientSecret": {
+                        "reference": {
+                            "keyVault": {
+                                "id": "[variables('vmEncryptionSettings').keyVaultId]"
+                            },
+                            "secretName": "aadClientSecret"
+                        }
+                    },
+                    "keyEncryptionKeyURL": {
+                        "reference": {
+                            "keyVault": {
+                                "id": "[variables('vmEncryptionSettings').keyVaultId]"
+                            },
+                            "secretName": "keyEncryptionKeyURL"
+                        }
+                    },
+                    "workspaceName": {
+                        "value": "[variables('resourceNames').omsWorkspace]"
+                    },
+                    "AutomationAccountName": {
+                        "value": "[variables('resourceNames').automationAccount]"
+                    },
+                    "EnvironmentName": {
+                        "value": "[parameters('EnvironmentName')]"
+                    },
+                    "ResourceGroupName": {
+                        "value": "[resourceGroup().name]"
+                    },
+                    "SubscriptionId": {
+                        "value": "[subscription().subscriptionId]"
+                    }
+                }
+            }
+        },
+        {
+            "name": "[concat('ConfigureVMEncryption-', variables('vmNamesArraySQLMGT').VMs[copyIndex()].Name)]",
+            "type": "Microsoft.Resources/deployments",
+            "apiVersion": "2015-01-01",
+            "dependsOn": [
+                "ConfigureAutomationSchedules",
+		"ConfigureSQL"
+            ],
+            "copy": {
+                "name": "encryptionSQLMGTLoop",
+                "count": "[length(variables('vmNamesArraySQLMGT').VMs)]"
+            },
+            "properties": {
+                "mode": "Incremental",
+                "templateLink": {
+                    "uri": "[variables('vmEncryptionSettings').provisioningVMAzureDiskEncryptionUrl]",
+                    "contentVersion": "1.0.0.0"
+                },
+                "parameters": {
+                    "vmName": {
+                        "value": "[variables('vmNamesArraySQLMGT').VMs[copyIndex()].Name]"
+                    },
+                    "keyVaultName": {
+                        "value": "[parameters('keyVaultName')]"
+                    },
+                    "vmEncryptionSettings": {
+                        "value": "[variables('vmEncryptionSettings')]"
+                    },
+                    "aadClientID": {
+                        "reference": {
+                            "keyVault": {
+                                "id": "[variables('vmEncryptionSettings').keyVaultId]"
+                            },
+                            "secretName": "aadClientID"
+                        }
+                    },
+                    "aadClientSecret": {
+                        "reference": {
+                            "keyVault": {
+                                "id": "[variables('vmEncryptionSettings').keyVaultId]"
+                            },
+                            "secretName": "aadClientSecret"
+                        }
+                    },
+                    "keyEncryptionKeyURL": {
+                        "reference": {
+                            "keyVault": {
+                                "id": "[variables('vmEncryptionSettings').keyVaultId]"
+                            },
+                            "secretName": "keyEncryptionKeyURL"
+                        }
+                    },
+                    "workspaceName": {
+                        "value": "[variables('resourceNames').omsWorkspace]"
+                    },
+                    "AutomationAccountName": {
+                        "value": "[variables('resourceNames').automationAccount]"
+                    },
+                    "EnvironmentName": {
+                        "value": "[parameters('EnvironmentName')]"
+                    },
+                    "ResourceGroupName": {
+                        "value": "[resourceGroup().name]"
+                    },
+                    "SubscriptionId": {
+                        "value": "[subscription().subscriptionId]"
+                    }
+                }
+            }
+        },
+        {
+            "apiVersion": "2017-05-10",
+            "name": "ConfigureSQL",
+            "comments": "External template for deploying a SQL 2017 AlwaysOn solution with Azure Cloud Witness for quorum/cluster vote.",
+            "type": "Microsoft.Resources/deployments",
+            "dependsOn": [
+		"ConfigureWEB"    
+            ],
+            "properties": {
+              "mode": "incremental",
+              "templateLink": {
+                 "uri":"https://raw.githubusercontent.com/Azure/fedramp-iaas-webapp/master/externaltemplates/ConfigureSQL.json",
+                 "contentVersion":"1.0.0.0"
+              },
+              "parameters": {
+                    "domainName": {
+                        "reference": {
+                            "keyVault": {
+                                "id": "[variables('derivedIds').keyVaultId]"
+                            },
+                            "secretName": "domain"
+                        } 
+                    },
+                    "sqlVmSize": {
+                        "value": "[parameters('sqlVmSize')]"
+                    },
+                    "sqlnodeIpAddresses": {
+                        "Value": [
+                          "10.200.1.6",
+                          "10.200.1.7"
+                        ]
+                    },
+                    "sqlclusterIpAddress": {
+                        "Value": "10.200.1.8"
+                    },
+                    "adminUsername": {
+                        "reference": {
+                          "keyVault": {
+                            "id": "[variables('derivedIds').keyVaultId]"
+                          },
+                          "secretName": "adminUsername"
+                        }
+                    },
+                    "adminPassword": {
+                        "reference": {
+                            "keyVault": {
+                                "id": "[variables('derivedIds').keyVaultId]"
+                            },
+                            "secretName": "adminPassword"
+                        }
+                    },
+                    "StorageAccountType": {
+                        "value": "[parameters('StorageAccountType')]"
+                    },
+                    "sqlVmImagePublisher": {
+                        "Value": "MicrosoftSqlServer"
+                    },
+                    "sqlServerVersion": {
+                        "value": "[parameters('sqlServerVersion')]"
+                    },
+                    "sqlVmImageSku": {
+                        "Value": "Enterprise"
+                    },
+                    "sqlsubnetId": {
+                        "Value": "[variables('derivedIds').sqlSubnet]"
+                    }
+               }
+            }
+        }
+    ]
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
