@@ -583,7 +583,7 @@
             }
         },
         {
-        "apiVersion": "2017-05-10",
+        "apiVersion": "2015-01-01",
         "name": "pid-1dd2b3cb-a191-44e3-82c0-9aec7457f754",
         "comments": "GUID for tracking deployments intended for production use.",
         "type": "Microsoft.Resources/deployments",
@@ -1760,7 +1760,7 @@
             }
         },
         {
-            "apiVersion": "2017-05-10",
+            "apiVersion": "2015-01-01",
             "name": "ConfigureSQL",
             "comments": "External template for deploying a SQL 2017 AlwaysOn solution with Azure Cloud Witness for quorum/cluster vote.",
             "type": "Microsoft.Resources/deployments",
