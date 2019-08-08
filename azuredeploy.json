@@ -322,7 +322,7 @@
           "appGateway": {
               "name": "appgateway",
               "properties": {
-                  "addressPrefix": ""
+                  "addressPrefix": "10.200.4.0/24"
               }
           }
         },
