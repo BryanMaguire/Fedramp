@@ -107,7 +107,9 @@
       "AutomationAccountName": {
         "type": "string"
       },
-     
+      "EnvironmentName": {
+        "type": "string"
+      },
       "ResourceGroupName": {
         "type": "string"
       },
@@ -471,6 +473,9 @@
                 },
                 "SubscriptionId": {
                   "value": "[parameters('SubscriptionId')]"
+                },
+                "EnvironmentName": {
+                  "value": "[parameters('EnvironmentName')]"
                 }
               }
             }
