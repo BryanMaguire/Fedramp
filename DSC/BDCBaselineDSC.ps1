@@ -212,7 +212,7 @@ configuration BDCConfigureBaselineDSC
             SysvolPath = "F:\SYSVOL"
             DependsOn = "[xWaitForADDomain]DscForestWait"
         }
-        Script script1
+        <# Script script1
         {
             SetScript =
             {
@@ -226,6 +226,6 @@ configuration BDCConfigureBaselineDSC
             GetScript =  { @{} }
             TestScript = { $false}
             DependsOn = "[xADDomainController]BDC"
-        }
+        } #>
     }
 }
