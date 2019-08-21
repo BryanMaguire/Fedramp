@@ -361,18 +361,18 @@
                 "mgt": "[concat(uniqueString(resourceGroup().id), 'mgt')]"
             },
             "vms": {
-                "adpdc": "TEST-prd-DC1-VM",
-                "adbdc": "TEST-prd-DC2-VM",
-                "web": "TEST-prd-APP-VM",
-                "mgt": "TEST-prd-MGT-VM",
-                "sql0" : "TEST-prd-SQL1-VM",
-                "sql1" : "TEST-prd-SQL2-VM"
+                "adpdc": "CW-prd-DC1-VM",
+                "adbdc": "CW-prd-DC2-VM",
+                "web": "CW-prd-APP-VM",
+                "mgt": "CW-prd-MGT-VM",
+                "sql0" : "CW-prd-SQL1-VM",
+                "sql1" : "CW-prd-SQL2-VM"
             },
             "nics": {
-                "adpdc": "TEST-prd-DC1-nic",
-                "adbdc": "TEST-prd-DC2-nic",
-                "web": "TEST-prd-APP-nic",
-                "mgt": "TEST-prd-MGT-nic"
+                "adpdc": "CW-prd-DC1-nic",
+                "adbdc": "CW-prd-DC2-nic",
+                "web": "CW-prd-APP-nic",
+                "mgt": "CW-prd-MGT-nic"
             },
             "loadBalancers": {
                 "rdpLBFEName": "rdpLBFE",
@@ -488,10 +488,10 @@
         "vmNames": {
             "VMs": [
                 {
-                    "Name": "TEST-prd-DC1-VM"
+                    "Name": "CW-prd-DC1-VM"
                 },
                 {
-                    "Name": "TEST-prd-DC2-VM"
+                    "Name": "CW-prd-DC2-VM"
                 },
                 {
                     "Name": "%%APPVM0%%"
@@ -500,13 +500,13 @@
                     "Name": "%%APPVM1%%"
                 },
                 {
-                    "Name": "TEST-prd-MGT-VM"
+                    "Name": "CW-prd-MGT-VM"
                 },
                 {
-                    "Name": "TEST-prd-SQL1-VM"
+                    "Name": "CW-prd-SQL1-VM"
                 },
                 {
-                    "Name": "TEST-prd-SQL1-VM"
+                    "Name": "CW-prd-SQL1-VM"
                 }
             ]
         }
